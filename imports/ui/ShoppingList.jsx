@@ -24,11 +24,16 @@ class ShoppingList extends Component {
     //Store data in variables
     var text = data.itemName;
     var qty = data.quantityNeeded;
-    //Insert Data into the Database
-    Meteor.call('items.insert', text, qty);
-    //Clear fields so that the user can submit another item
-    data.itemName = '';
-    data.quantityNeeded = '';
+    //Check fields have data
+    if(text != '' && qty != '') {
+      //Insert Data into the Database
+      Meteor.call('items.insert', text, qty);
+      //Clear fields so that the user can submit another item
+      data.itemName = '';
+      data.quantityNeeded = '';
+    } else {
+      alert('Please fill out all fields');
+    }
   };
 
   //toggle the showing and hiding of checked items
@@ -74,17 +79,23 @@ class ShoppingList extends Component {
           </div>
           }
           {/* Checkbox to toggle show/hide on checked items */}
-          <div className="filter-button">
-          <label>
-            <input 
-              type="checkbox"
-              readOnly
-              checked={this.state.hideCompleted}
-              onClick={this.toggleHideCompleted.bind(this)}
-            />
-            Hide Completed Items
-          </label>
-          </div>
+          {/* If statement to check if a user is logged in or not */}
+          { this.props.currentUser ? 
+            <div className="filter-button">
+              <label>
+                <input 
+                  type="checkbox"
+                  readOnly
+                  checked={this.state.hideCompleted}
+                  onClick={this.toggleHideCompleted.bind(this)}
+                />
+                Hide Completed Items
+              </label>
+            </div>
+          : 
+            <span></span>
+          }
+          
 
         </header>
 
@@ -100,7 +111,7 @@ export default withTracker (() => {
   Meteor.subscribe('items');
   //Store Server queries into props for use in the page
   return {
-    items: Items.find({}, {sort: { createdAt: -1} }).fetch(),
+    items: Items.find({}, {sort: { text: 1} }).fetch(),
     incompletedItemCount: Items.find({ checked: { $ne: true } }).count(),
     currentUser: Meteor.user(),
   };

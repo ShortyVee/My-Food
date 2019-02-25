@@ -5,10 +5,12 @@ const ShoppingCartSchema = new SimpleSchema({
     itemName: {
         type: String,
         defaultValue: '',
+        optional: false,
     },
     quantityNeeded: {
         type: String,
         defaultValue: '',
+        optional: false,
     },
 });
 
